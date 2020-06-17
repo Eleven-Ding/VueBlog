@@ -7,8 +7,18 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "axios": "^0.19.2",
+    "canvas-nest.js": "^2.0.4",
     "core-js": "^3.6.4",
-    "vue": "^2.6.11"
+    "element-ui": "^2.13.2",
+    "highlight.js": "^10.0.3",
+    "prismjs": "^1.20.0",
+    "vue": "^2.6.11",
+    "vue-canvas-nest": "^2.0.0",
+    "vue-highlight.js": "^3.1.0",
+    "vue-live2d": "^1.0.3",
+    "vue-router": "^3.0.7",
+    "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",

@@ -7,7 +7,6 @@ var _self = (typeof window !== 'undefined')
 		? self // if in worker
 		: {}   // if in node js
 	);
-
 /**
  * Prism: Lightweight, robust, elegant syntax highlighting
  * MIT license http://www.opensource.org/licenses/mit-license.php/
