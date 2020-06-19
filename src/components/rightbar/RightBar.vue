@@ -25,14 +25,26 @@
 
     <div class="hot">
       <div class="artcle"><i class="el-icon-s-opportunity"></i>热门文章</div>
-      <div class="item" v-for="(item,index) in list" :key="item.id" @click="GoDetail(item.id)" >
+      <div class="item" v-for="(item,index) in list" :key="item.id" @click="GoDetail(item.id)">
         <img :src="item.url" alt="">
-        <div class="right" >
-          <div style="height: 40%;"><span class="title" ># {{item.title}}</span></div>
+        <div class="right">
+          <div style="height: 40%;"><span class="title"># {{item.title}}</span></div>
           <div class="right_wrap">
             <span class="time"><i class="el-icon-watch"></i>{{item.date.substring(0,10)}}</span>
             <span class="view"><i class="el-icon-view"></i>{{item.viewcount}}</span>
           </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="cloud">
+      <div class="cloud_title" style="font-weight: 600;color: #777777">标签云</div>
+      <div class="cloud_wrap">
+        <div class="cloud_item" v-for="(cloud,index) in clouds">
+          <el-tooltip :content="'该标签下有'+cloud.count+'篇文章'" placement="top">
+            <el-button size="mini">{{cloud.type}}</el-button>
+          </el-tooltip>
         </div>
       </div>
     </div>
@@ -46,7 +58,9 @@
     name: "RightBar",
     data() {
       return {
-        list: []
+        list: [],
+        //标签
+        clouds: [],
       }
     },
     methods: {
@@ -63,6 +77,20 @@
     },
     mounted() {
       request('/getArticles').then(res => {
+        for (let i = 0; i < res.data.length; i++) {
+          let obj = {}
+          obj.type = res.data[i].type
+          obj.count = 1
+          let index = this.clouds.findIndex(item => item.type === obj.type)
+          if (index === -1) {
+            this.clouds.push(obj)
+          } else {
+            this.clouds[index].count = this.clouds[index].count + 1
+          }
+        }
+        //遍历data
+
+
         this.list = res.data.sort(function (a, b) {
           return b.viewcount - a.viewcount
         }).splice(0, 2)
@@ -72,15 +100,32 @@
 </script>
 
 <style scoped>
-  .artcle{
+  .cloud_wrap{
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .cloud_item{
+    margin-left: 8px;
+    margin-top: 5px;
+  }
+  .cloud {
+    margin-top: 10px;
+    border-radius: 4px;
+    padding: 15px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, .1);
+  }
+
+  .artcle {
     font-weight: 600;
     cursor: pointer;
     color: #6e6e6e;
   }
-  .artcle:hover{
+
+  .artcle:hover {
     color: #3eb0e0;
     transition: all .2s linear;
   }
+
   .item {
     display: flex;
     margin-top: 5px;
@@ -227,7 +272,7 @@
   }
 
   @media not screen and (min-width: 70em) {
-    .right-bar{
+    .right-bar {
       display: none;
     }
   }

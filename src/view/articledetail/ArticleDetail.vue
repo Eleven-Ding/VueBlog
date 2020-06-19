@@ -25,6 +25,10 @@
         </code>
       </pre>
       </div>
+      <div class="tag" style="color: #2c789e;text-align: left;width: 80%;padding: 20px 0;font-size: 18px;">
+        <i class="el-icon-collection-tag"></i>
+        <span> 类别:{{data.type}} </span>
+      </div>
     </div>
     <Pay></Pay>
     <div class="comment" style="padding: 0 20px ;margin: 20px auto">
@@ -64,7 +68,9 @@
           <img v-if="item.user!=='dsy_zqy'" src="../../assets/img/customer.png" alt="">
           <div class="right">
             <div class="username" style="color: #409EFF"><span
-                    style="color: #ff854f;border: 1px solid #ff854f;font-size: 14px;" v-if="item.user==='dsy_zqy'">博主</span>{{item.user}} :</div>
+                    style="color: #ff854f;border: 1px solid #ff854f;font-size: 14px;"
+                    v-if="item.user==='dsy_zqy'">博主</span>{{item.user}} :
+            </div>
             <div class="time_wrap" style="display: flex;align-items: center;width: 100%;justify-content: space-between">
               <span class="content" style="color: #343434;margin-top: 4px;font-size: 15px;">{{item.comment}}</span>
               <span class="commenttile" style="color: #999999;font-size: 13px;">{{item.time|Time}}</span>
@@ -96,7 +102,7 @@
         commentList: []
       }
     },
-    components:{
+    components: {
       Pay
     },
     beforeMount() {
@@ -116,56 +122,56 @@
       '$route': 'getPath'
     },
     methods: {
-      subComment(){
+      subComment() {
 
         /*检测登录没得*/
-        if(!this.$store.getters.getUsername){
+        if (!this.$store.getters.getUsername) {
           this.$message({
             message: '还没有登录喔~请先登录.',
             type: 'warning'
           });
-        }else if(this.comment===''){
+        } else if (this.comment === '') {
           this.$message({
             message: '你都没什么想说的吗?',
             type: 'warning'
           });
-        }else if(this.comment.includes("'")){
+        } else if (this.comment.includes("'")) {
           this.$message({
             message: '输入内容请不要包含单引号~~请谅解~~',
             type: 'warning'
           });
-        }else{
+        } else {
           /*把comment,文章id,username发过去*/
           request({
-            url:'/comment/articleComment',
-            method :"POST",
-            data:{
-              id:this.id,
-              user:this.$store.getters.getUsername,
-              comment:this.comment
+            url: '/comment/articleComment',
+            method: "POST",
+            data: {
+              id: this.id,
+              user: this.$store.getters.getUsername,
+              comment: this.comment
             }
-          }).then(res=>{
-            this.getAll().then(res=>{
+          }).then(res => {
+            this.getAll().then(res => {
               this.$message({
                 message: '感谢评论!',
                 type: 'success'
               });
             })
-            this.comment=''
+            this.comment = ''
 
           })
         }
       },
-      getAll(){
+      getAll() {
         return new Promise(((resolve, reject) => {
-          request(`/comment/getAll?id=${this.id}`).then(res=>{
-            this.commentList=res.data
+          request(`/comment/getAll?id=${this.id}`).then(res => {
+            this.commentList = res.data
             resolve('233')
           })
         }))
       },
-      loginout(){
-        this.$store.dispatch('changeUsername',null)
+      loginout() {
+        this.$store.dispatch('changeUsername', null)
       },
       login() {
         this.$store.dispatch('changeLogin', true)
@@ -194,14 +200,15 @@
 </script>
 
 <style scoped>
-  .list{
+  .list {
     background-color: rgba(242, 242, 242, 0.71);
     margin-top: 5px;
     padding: 10px;
     border-radius: 10px;
     display: flex;
   }
-  .list .right{
+
+  .list .right {
     padding-left: 6px;
 
     width: 100%;
@@ -209,11 +216,13 @@
     flex-direction: column;
 
   }
-  .list img{
+
+  .list img {
     border-radius: 50%;
     width: 55px;
     height: 55px;
   }
+
   .commentArea {
     margin-top: 20px;
     padding-bottom: 60px;
