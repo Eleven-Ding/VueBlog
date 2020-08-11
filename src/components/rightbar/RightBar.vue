@@ -3,12 +3,12 @@
     <div class="avat-wrap">
       <div class="user" v-if="!$store.getters.getUsername" @click="goAbout">
         <!--这个也是用判断来决定显示我的头像还是游客头像-->
-        <img src="@/assets/img/rightbar/avat.jpg" alt="">
+        <img src="http://www.shyding.xyz/MyImg/img/avat.46349574.jpg" alt="" title="爱的魔力转圈圈">
         <span class="username">DShy</span>
       </div>
       <div class="user" v-else>
         <!--这个也是用判断来决定显示我的头像还是游客头像-->
-        <img src="@/assets/img/rightbar/avat.jpg" alt="">
+        <img src="http://www.shyding.xyz/MyImg/img/avat.46349574.jpg" alt="" title="爱的魔力转圈圈">
         <span class="username">{{$store.getters.getUsername}}</span>
       </div>
       <!--上面-->
@@ -26,11 +26,11 @@
     <div class="hot">
       <div class="artcle"><i class="el-icon-s-opportunity"></i>热门文章</div>
       <div class="item" v-for="(item,index) in list" :key="item.id" @click="GoDetail(item.id)">
-        <img :src="item.url" alt="">
+        <img v-lazy="item.url" alt="">
         <div class="right">
-          <div style="height: 40%;"><span class="title"># {{item.title}}</span></div>
+          <div style="height: 40%;"><span class="title" style="overflow: hidden"># {{item.title}}</span></div>
           <div class="right_wrap">
-            <span class="time"><i class="el-icon-watch"></i>{{item.date.substring(0,10)}}</span>
+            <span class="time"><i class="el-icon-watch"></i>{{item.date.substring(0,10)||'0-0-0'}}</span>
             <span class="view"><i class="el-icon-view"></i>{{item.viewcount}}</span>
           </div>
         </div>
@@ -41,28 +41,24 @@
     <div class="cloud">
       <div class="cloud_title" style="font-weight: 600;color: #777777">标签云</div>
       <div class="cloud_wrap">
-        <div class="cloud_item" v-for="(cloud,index) in clouds">
+        <div class="cloud_item" v-for="(cloud,index) in clouds" @click="changeArticle(index)">
           <el-tooltip :content="'该标签下有'+cloud.count+'篇文章'" placement="top">
-            <el-button size="mini">{{cloud.type}}</el-button>
+            <span class="type_count" :style="{backgroundColor:ColorList[`${cloud.type}`]}">{{cloud.type}}</span>
+            <!--            <el-button size="mini">{{cloud.type}}</el-button>-->
           </el-tooltip>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
-  import {request} from "../../network/request";
-
+  import {mapState} from 'vuex'
+  import {CloudeMixin} from "@/mixin";
   export default {
     name: "RightBar",
-    data() {
-      return {
-        list: [],
-        //标签
-        clouds: [],
-      }
-    },
+    mixins: [CloudeMixin],
     methods: {
       goAbout() {
         this.$router.push('/about')
@@ -76,38 +72,68 @@
       }
     },
     mounted() {
-      request('/getArticles').then(res => {
-        for (let i = 0; i < res.data.length; i++) {
-          let obj = {}
-          obj.type = res.data[i].type
-          obj.count = 1
-          let index = this.clouds.findIndex(item => item.type === obj.type)
-          if (index === -1) {
-            this.clouds.push(obj)
-          } else {
-            this.clouds[index].count = this.clouds[index].count + 1
-          }
-        }
-        //遍历data
+      this.$bus.$on('loadOver', () => {
+        this.LoadCloud()
+        this.LoadList()
 
-
-        this.list = res.data.sort(function (a, b) {
-          return b.viewcount - a.viewcount
-        }).splice(0, 2)
       })
-    }
+
+    },
+    computed: mapState({
+      ColorList: state => state.ColorList,
+
+    }),
+
   }
 </script>
 
 <style scoped>
-  .cloud_wrap{
+  .type_count {
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    padding: 4px 12px;
+    color: white;
+    outline: none;
+    font-size: 13px;
+    letter-spacing: 1px;
+    transition: .5s;
+    border-radius: 20px;
+  }
+
+  .type_count:hover {
+    border-radius: 0px;
+  }
+
+  .type_count::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    /*background-color: #da4939;*/
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    transition: .5s;
+  }
+
+  .type_count:hover::before {
+    left: 100%
+  }
+
+  .cloud_wrap {
     display: flex;
     flex-wrap: wrap;
   }
-  .cloud_item{
+
+  .cloud_item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-left: 8px;
-    margin-top: 5px;
+    margin-top: 10px;
   }
+
   .cloud {
     margin-top: 10px;
     border-radius: 4px;
@@ -167,6 +193,10 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
     position: absolute;
     color: #626262;
     left: 5%;
@@ -185,7 +215,7 @@
     /*right: 13%;*/
     position: absolute;
     right: 13%;
-    top: 140px;
+    top: 150px;
     min-width: 100px;
     width: 21%;
 
@@ -198,6 +228,7 @@
     background: #fff;
     height: 100%;
     width: 100%;
+    overflow: hidden;
     position: relative;
   }
 
@@ -205,7 +236,7 @@
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     height: 120px;
-    background: url("https://img.cdn.zhengbeining.com/bgc.jpg") no-repeat 50%;
+    background: url("http://www.shyding.xyz/MyImg/img/bgc.271d7712.jpeg") no-repeat 50%;
     background-size: cover;
   }
 
@@ -214,6 +245,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-image: linear-gradient(-225deg, #e1fded 0%, rgba(255, 241, 250, 0.71) 100%);
   }
 
   .avat-foot .avat-text {
@@ -227,7 +259,7 @@
     display: flex;
     align-items: center;
     top: 50%;
-    left: 15%;
+    left: 10%;
     transform: translateY(-50%);
   }
 
@@ -271,7 +303,7 @@
     }
   }
 
-  @media not screen and (min-width: 70em) {
+  @media not screen and (min-width: 65em) {
     .right-bar {
       display: none;
     }

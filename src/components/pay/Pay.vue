@@ -1,14 +1,14 @@
 <template>
   <div class="pay">
     <div class="img">
-      <el-divider><img @click="change" style="width: 40px" src="../../assets/img/pay.png" alt="">
+      <el-divider><img @click="change" style="width: 40px" src="http://www.shyding.xyz/MyImg/img/pay.4782b1df.png" alt="">
       </el-divider>
     </div>
     <div class="show" v-show="show">
       <div style="text-align: center;font-size: 16px;color: #da8350">鼓励一下吖~~(实则网络乞丐)</div>
       <div class="pp">
-        <img src="../../assets/img/wechat.png" alt="">
-        <img src="../../assets/img/airpay.png" alt="">
+        <img src="http://www.shyding.xyz/MyImg/img/wechat.0248235a.png" alt="">
+        <img src="http://www.shyding.xyz/MyImg/img/airpay.c4f9c19a.png" alt="">
       </div>
     </div>
   </div>

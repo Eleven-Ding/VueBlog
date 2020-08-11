@@ -31,34 +31,35 @@
         <div class="user_wrap" v-for="(item,index) in commentList" :key="item.id">
           <!--头像-->
           <div class="avat">
-            <img v-if="item.user==='dsy_zqy'" src="../../assets/img/rightbar/avat.jpg" alt="">
-            <img v-else src="../../assets/img/customer.png" alt="">
+            <img  v-if="item.user==='dsy_zqy'" src="http://www.shyding.xyz/MyImg/img/avat.46349574.jpg" alt="">
+            <img v-else src="http://www.shyding.xyz/MyImg/img/customer.4551dd9a.png" alt="">
           </div>
           <div class="right">
-            <div class="name"><span v-if="item.user==='dsy_zqy'" class="host">博主</span>{{item.user}}</div>
+            <div class="name"><span v-if="item.user==='dsy_zqy'" class="host">博主</span> <span>{{item.user}}</span> </div>
             <div class="user_content">{{item.content}}</div>
             <div class="time_wrap">
-              <span class="content_time">{{item.time|timeType}}</span>
+              <span class="content_time"><i class="el-icon-date"></i>{{item.time|timeType}}</span>
               <span class="reply" @click="reply(item.user,item.id)"><i class="el-icon-chat-round"></i>回复</span>
             </div>
 
             <div class="reply_box"
-                 style="background-color: rgba(247,247,247,0.93);width: 90%;border-radius: 5px;padding: 0 3px">
+                 style="position: relative;background-color: rgba(247,247,247,0.93);width: 90%;border-radius: 5px;padding: 0 3px">
               <!--左边头像 右边-->
               <div class="reply_wrap" v-for="(item2,index2) in getOwnReply(item.id)" :key="item2.id">
                 <div class="avat_reply">
-                  <img v-if="item2.user==='dsy_zqy'" src="../../assets/img/rightbar/avat.jpg" alt="">
-                  <img v-else src="../../assets/img/customer.png" alt="">
+                  <img v-if="item2.user==='dsy_zqy'" src="http://www.shyding.xyz/MyImg/img/avat.46349574.jpg" alt="">
+                  <img v-else src="http://www.shyding.xyz/MyImg/img/customer.4551dd9a.png" alt="">
                 </div>
 
-                <div class="reply_right">
+                <div class="reply_right" style="width: 80%;">
                   <div class="name"><span v-if="item2.user==='dsy_zqy'" class="host">博主</span>{{item2.user}}</div>
-                  <div style="font-size: 13px;">回复<span style="color: #4bbeff"
+                  <div style="font-size: 13px;">回复<span style="color: #4bbeff;"
                                                         class="reply_name_blue">@{{item2.name}}:</span> {{item2.reply}}
                   </div>
                   <div class="time_wrap2">
-                    <span>{{item2.time|timeType}}</span>
-                    <span class="reply" @click="reply(item2.user,item.id)"><i class="el-icon-chat-round"></i>回复</span>
+                    <span><i class="el-icon-date"></i>{{item2.time|timeType}}</span>
+                    <span class="reply"  @click="reply(item2.user,item.id)"><i
+                            class="el-icon-chat-round"></i>回复</span>
                   </div>
                 </div>
               </div>
@@ -83,8 +84,6 @@
 </template>
 
 <script>
-  import {request} from "../../network/request";
-
   export default {
     name: "Comment",
     data() {
@@ -125,14 +124,14 @@
         } else {
           /*发送网络请求*/
           console.log('发送');
-          request({
+          this.request({
             url: '/comment/reply',
             method: "POST",
             data: {
               user: this.$store.getters.getUsername,
               theme_id: id,
               name: this.replyFor,
-              reply:this.replyContent
+              reply: this.replyContent
             }
           }).then(res => {
             this.getAllReply()
@@ -140,9 +139,9 @@
               message: '回复成功!',
               type: 'success'
             });
-            this.replyContent =""
-            let index=this.commentList.findIndex(item=>item.id===id)
-            this.commentList[index].ishow=false
+            this.replyContent = ""
+            let index = this.commentList.findIndex(item => item.id === id)
+            this.commentList[index].ishow = false
           })
         }
 
@@ -157,11 +156,10 @@
         let index = this.commentList.findIndex(item => item.id === id)
         this.commentList[index].ishow = !this.commentList[index].ishow
         this.replyFor = user
-        console.log(this.$store.getters.getUsername, '回复', user, id);
       },
       getAllReply() {
         return new Promise(((resolve, reject) => {
-          request('/comment/getReply').then(res => {
+          this.request('/comment/getReply').then(res => {
             this.AllReply = res.data
             // console.log(res);
             resolve('233')
@@ -170,13 +168,12 @@
       },
       getAllComments() {
         /*获取所有评论表*/
-        request('/comment/getComment').then(res => {
+        this.request('/comment/getComment').then(res => {
           /*把数据赋值给list*/
-          this.commentList = res.data
+          this.commentList = res.data.reverse()
         })
       },
       login() {
-        console.log('登录');
         this.$store.dispatch('changeLogin', true)
       },
       submit() {
@@ -200,7 +197,7 @@
         } else {//把数据存到数据库
           let user = this.$store.getters.getUsername
           let content = this.comment
-          request({
+          this.request({
             url: '/comment',
             method: "POST",
             data: {
@@ -243,7 +240,7 @@
     display: flex;
     position: relative;
     justify-content: space-between;
-    width: 500px;
+
     margin-top: 6px;
   }
 
@@ -256,11 +253,10 @@
 
   .reply_right {
     overflow: hidden;
-    flex: 9;
+    flex: 7;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-
   }
 
 
@@ -282,12 +278,15 @@
 
   .avat {
     position: relative;
+
     flex: 1;
+
     display: flex;
+
     align-items: flex-start;
+
     justify-content: flex-end;
     transition: all .5s;
-
   }
 
   .user_wrap img {
@@ -303,6 +302,7 @@
     overflow: hidden;
     padding-left: 5px;
     display: flex;
+    display: -ms-flexbox;
     flex: 8;
     flex-direction: column;
     align-items: flex-start;
@@ -333,15 +333,16 @@
   .time_wrap .reply {
     cursor: pointer;
   }
-  .time_wrap2{
+
+  .time_wrap2 {
     display: flex;
     justify-content: space-between;
-
     font-size: 13px;
     color: #999999;
-    width: 70%;
+    width: 100%;
   }
-  .time_wrap2 .reply{
+
+  .time_wrap2 .reply {
     cursor: pointer;
 
   }
@@ -350,6 +351,7 @@
     padding-top: 20px;
     text-align: center;
     width: 55%;
+
     padding-bottom: 50px;
     background-color: white;
     box-shadow: 0 0 5px rgba(0, 0, 0, .1);
@@ -397,22 +399,53 @@
     }
   }
 
-  .avat img:hover{
+  .avat img:hover {
     transform: rotate(360deg);
     animation: rotation .4s linear;
   }
-  .avat_reply img:hover{
+
+  .avat_reply img:hover {
     transform: rotate(360deg);
     animation: rotation .4s linear;
+  }
+  @media not screen and (min-width: 65em) {
+    .comment {
+      width: 80%;
+
+    }
   }
   @media not screen and (min-width: 45em) {
-    .comment{
+    .comment {
       width: 100%;
+      margin-top: 20%;
     }
-    .time_wrap2 .reply{
+
+    .time_wrap2 .reply {
       cursor: pointer;
-      margin-left: 80px;
+
+    }
+
+    .reply_wrap {
+      padding: 8px 0;
+      display: flex;
+      position: relative;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 6px;
+    }
+    .reply_right {
+      overflow: hidden;
+      flex: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 
+  @media not screen and (min-width: 40em) {
+    .comment {
+      width: 100%;
+      margin-top: 40%;
+    }
+  }
 </style>

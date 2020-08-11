@@ -18,7 +18,6 @@
       <div class="right">
         <div class="bbb">
           <el-autocomplete class="el-auto"
-
                            suffix-icon="el-icon-search"
                            size="medium"
                            v-model="state"
@@ -29,15 +28,14 @@
         </div>
 
         <div class="right-login" v-if="!$store.getters.getUsername" @click="login">
-          <u>登录</u>
+          <span>登录</span>
         </div>
         <div class="right-login" v-else>
-          Welcome!
           <el-dropdown :hide-on-click="false">
             <span class="el-dropdown-link"> {{$store.getters.getUsername}}
               <i class="el-icon-arrow-down el-icon--right"></i></span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="loginout">退出登录</el-dropdown-item>
+              <el-dropdown-item @click.native="loginout" style="z-index: 99999999">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -65,7 +63,8 @@
 </template>
 
 <script>
-  import {request} from "../../network/request";
+
+  import {mapState} from 'vuex'
 
   export default {
     name: "TabBar",
@@ -73,20 +72,20 @@
       return {
         /*这个应该存在session或者vuex中*/
         username: null,
-        itemList: [
+        itemList: Object.freeze([
           {text: '首页', icon: 'icon-home', path: '/home'},
           {text: '归档', icon: 'icon-guidang', path: '/file'},
           {text: '友联', icon: 'icon-lianjie', path: '/friend'},
-          {text: '留言板', icon: 'icon-comment', path: '/comment'},
+          {text: '留言', icon: 'icon-comment', path: '/comment'},
           {text: '关于', icon: 'icon-about', path: '/about'},
-        ],
-        mobileList: [
+        ]),
+        mobileList: Object.freeze([
           {text: '首页', icon: 'el-icon-plus', path: '/home'},
           {text: '归档', icon: 'el-icon-receiving', path: '/file'},
           {text: '友链', icon: 'el-icon-connection', path: '/friend'},
-          {text: '留言板', icon: 'el-icon-chat-line-square', path: '/comment'},
+          {text: '留言', icon: 'el-icon-chat-line-square', path: '/comment'},
           {text: '关于', icon: 'el-icon-circle-check', path: '/about'}
-        ],
+        ]),
         restaurants: [],
         mobileTitle: '首页',
         state: '',
@@ -106,46 +105,58 @@
         this.$router.push('/home')
       },
       itemClick(index) {
+        if(index===0){
+          this.$bus.$emit('changeArticle',0)
+        }
         this.$router.push(this.itemList[index].path)
         this.mobileTitle = this.mobileList[index].text
-
-        // console.log(index);
       },
       MobileClick(index) {
+        if(index===0){
+          this.$bus.$emit('changeArticle',0)
+        }
         this.mobileTitle = this.mobileList[index].text
         this.$router.push(this.mobileList[index].path)
-      },
-      loadAll() {
-        return [{"value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号"}]
+
       },
       querySearchAsync(queryString, cb) {
-        var restaurants = this.restaurants;
-        var results = queryString ? restaurants.filter(this.createStateFilter(queryString)) : restaurants;
+        let restaurants = this.restaurants;
+        queryString = queryString.toLowerCase()
+        let results = []
 
+        //找到resulte value里面有queryString的
+        for (let i of this.restaurants) {
+          if (i.value.toLowerCase().includes(queryString)) {
+            results.push(i)
+          }
+        }
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
           cb(results);
         }, 3000 * Math.random());
       },
-      createStateFilter(queryString) {
-        return (state) => {
-          return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-        };
-      },
       handleSelect(item) {
-        console.log(item);
         this.$router.push({
-          path:`/home/article/`+item.address+``
+          path: `/home/article/` + item.address + ``
           /*在这里根据ID来获取*/
         })
       }
     },
+    computed: mapState({
+      ArticleList: state => state.ArticleList
+    }),
     mounted() {
-      request('/getArticles').then(res=>{
-        for(let i=0;i<res.data.length;i++){
-          let obj={}
-          obj.value=res.data[i].title
-          obj.address=res.data[i].id
+      this.$bus.$on('opc0', () => {
+        document.getElementsByClassName('tab-bar')[0].style.opacity = 0
+      })
+      this.$bus.$on('opc1', () => {
+        document.getElementsByClassName('tab-bar')[0].style.opacity = 1
+      })
+      this.$bus.$on('loadOver', () => {
+        for (let i = 0; i < this.ArticleList.length; i++) {
+          let obj = {}
+          obj.value = this.ArticleList[i].title
+          obj.address = this.ArticleList[i].id
           this.restaurants.push(obj)
         }
       })
@@ -175,9 +186,10 @@
   }
 
   .tab-bar {
+    transition: all .1s linear;
     height: 75px;
     width: 100%;
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
     top: -1px;
@@ -232,7 +244,7 @@
     justify-content: center;
     font-size: 17px;
     flex: 3.5;
-    min-width: 500px;
+    min-width: 440px;
   }
 
   .middle .item {
@@ -270,24 +282,43 @@
   .right {
     display: flex;
     align-items: center;
-
     flex: 3;
   }
 
   .right-login {
-    color: #4bbeff;
-    margin-left: 50px;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+
+    text-align: center;
+    width: 70%;
     cursor: pointer;
+
+  }
+
+  .right-login span {
+    display: block;
+    overflow: hidden;
+    margin-left: 0;
+    color: #cc3563;
+    width: 100%;
   }
 
   /*移动端样式*/
   @media not screen and (min-width: 45em) {
     .bbb /deep/ .el-input {
-      width: 150px;
+      width: 110px;
     }
-    .aaa /deep/ .el-dropdown{
-      width: 100px;
-      margin-left: -38px;
+
+    .aaa {
+      text-align: left;
+    }
+
+    .aaa /deep/ .el-dropdown {
+      width: 70px;
+      margin-left: -18px;
+      text-align: left;
+
     }
 
     .tab-bar {
@@ -320,12 +351,17 @@
 
     .right {
       justify-content: space-around;
+
     }
 
     .right .right-login {
-      display: block;
-      width:50px;
-      margin: 4px;
+      overflow: hidden;
+      text-overflow:ellipsis;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      width: 75px;
+      max-width: 75px;
     }
 
     .el-dropdown-link {

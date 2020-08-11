@@ -1,13 +1,17 @@
 <template>
-  <div class="bottom">
+  <div class="bottom" >
+
     <span class="pp">
       <span class="smile">ｸﾞｯ!(๑•̀ㅂ•́)و✧</span>
       本博客已萌萌哒运行<span>{{runtime}}
       <span class="smile2"> ✧(´°ω°`)↯↯</span>
     </span>
     </span>
-    <div>托管于阿里云(学生机) | 使用阿里云存储</div>
-    <div>西华大学 丁时一个人博客 1559298665@qq.com</div>
+    <div style="display:flex;align-items: center;justify-content: center">托管于阿里云(学生机) | <a rel="nofollow" style="color: #d5d5d5" href="http://www.beian.miit.gov.cn" target="_blank">蜀ICP备20019999号-1</a>
+      <a href="https://www.cnzz.com/stat/website.php?web_id=1279136774" target="_blank" title="站长统计">
+       &nbsp; <img border="0" hspace="0" vspace="0" style="width: 18px;height: 14px;" src="https://icon.cnzz.com/img/pic1.gif"></a>
+    </div>
+    <div>DingShiYi 个人博客 前端技术小站 </div>
   </div>
 </template>
 
@@ -16,7 +20,7 @@
     name: "BottomBar",
     data() {
       return {
-        runtime: ''
+        runtime:  Object.freeze('')
       }
     },
     mounted() {
@@ -33,14 +37,15 @@
         let seconds = Math.floor(level3 / 1000)
         this.runtime = days + '天' + hours + '时' + minutes + '分' + seconds + '秒'
       }, 1000)
-    }
+
+    },
   }
 </script>
 
 <style scoped>
   .pp {
 
-
+    z-index: 99999999999999;
   }
 
   .smile2 {
@@ -68,9 +73,10 @@
       transform: translateX(-100%) translateY(0) rotate(0);
     }
   }
+
   @keyframes move2 {
     0% {
-      transform:translateY(0) rotate(0);
+      transform: translateY(0) rotate(0);
     }
     50% {
       transform: translateY(-3px) rotate(3deg);
@@ -84,18 +90,22 @@
   }
 
   .bottom {
-    margin-top: 40px;
-    color: #8c8c8c;
+    font-weight: bold;
+    margin-top: 70px;
+    color: #a5a5a5;
     background-color: #232323;
     height: 85px;
+
     box-sizing: border-box;
     padding: 15px 10px;
     text-align: center;
     font-size: 10px;
+    z-index: 9999999999999;
     line-height: 1.5em;
   }
 
   .bottom div {
     margin-top: 2px;
+
   }
 </style>

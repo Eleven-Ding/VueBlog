@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export function request(config) {
   //1.创建实例
   const instance = axios.create({
@@ -9,9 +7,6 @@ export function request(config) {
 
   //2.axios的拦截器
   //这里是拦截请求
-  //axios.inter******是全局拦截
-  //？？比如说config中的某些信息不符合服务器的要求
-  //？？每次请求的时候，界面中一个请求的图标
   //？？比如说某些网络请求必须要一些token的时候 拦截下这个请求 跳转到给token的页面
   instance.interceptors.request.use(config => {
     return config//这里返回出去  不然拦截下来了你不放 后面的就没了
@@ -22,7 +17,6 @@ export function request(config) {
   instance.interceptors.response.use(config => {
     return config.data///这里返回出去  不然拦截下来了你不放 后面的就没了
   }, err => {
-    console.log(err)
     return err
   });
 

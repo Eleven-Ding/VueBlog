@@ -16,7 +16,6 @@
 </template>
 
 <script>
-  import {request} from "../../network/request";
 
   export default {
     name: "Login",
@@ -54,7 +53,7 @@
           if(!this.isRegister){
             /*验证完了再登录 从数据库验证*/
             this.loading=true
-            request({
+            this.request({
               url:'/login',
               method:'POST',
               data:{
@@ -62,7 +61,7 @@
                 password:this.key
               }
             }).then(res=>{
-              console.log(res);
+
               this.loading=false
               if(!res.symbol){
                 this.$message.error('密码错误!');
@@ -80,13 +79,16 @@
                 this.$store.dispatch('changeLogin',false)
                 /*把username存起来*/
                 this.$store.dispatch('changeUsername',res.Info.user)
+
+                //将信息保存到本地
+                localStorage.setItem('username',res.Info.user)
               }
             })
           }else{
             /*如果是注册 发送网络请求*/
             this.loading=true
-            console.log('注册');
-            request({
+
+            this.request({
               url:'/login/register',
               method:'POST',
               data:{
@@ -95,7 +97,7 @@
               }
             }).then(res=>{
               this.loading=false
-              console.log(res);
+
               if(res.symbol){
                 this.$message({
                   message: res.msg,
@@ -119,12 +121,16 @@
 <style scoped>
 
   .login {
+
     z-index: 999;
     border-radius: 5px;
     position: fixed;
     width: 30%;
     height: 35%;
-    background-color: rgba(241, 241, 241, 0.67);
+    /*background-color: rgba(241, 241, 241, 0.67);*/
+    background-image: linear-gradient(-225deg, #E3FDF5 0%, #FFE6FA 100%);
+
+
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

@@ -6,7 +6,7 @@
         <span class="date"><i class="el-icon-watch"></i>{{data.date|Time}} </span>
         <span class="view"><i class="el-icon-view"></i>{{data.viewcount}}次围观</span>
       </div>
-      <img :src="data.url" alt="">
+      <img :src="data.url" alt="这里是兴趣使然的前端技术小站">
 
       <div class="summery">{{data.summery}}
         <el-divider><i class="el-icon-mobile-phone"></i></el-divider>
@@ -18,14 +18,14 @@
 
       <!--下面就是代码了-->
       <div class="container" style="
-      width: 80%;overflow-x: scroll" v-highlight>
-              <pre>
-        <code v-text="data.content">
+     overflow-x: scroll">
+
+        <code v-html="data.content" class="markdown-body">
 
         </code>
-      </pre>
+
       </div>
-      <div class="tag" style="color: #2c789e;text-align: left;width: 80%;padding: 20px 0;font-size: 18px;">
+      <div class="tag" style="color: #2c789e;text-align: left;padding: 20px 0;font-size: 18px;">
         <i class="el-icon-collection-tag"></i>
         <span> 类别:{{data.type}} </span>
       </div>
@@ -64,8 +64,8 @@
       <div class="commentArea">
         <div style="color: #999999;text-align: center" v-if="!commentList.length">暂时没有评论嗷，快来抢沙发，啾咪！~</div>
         <div v-else class="list" v-for="(item,index) in commentList">
-          <img v-if="item.user==='dsy_zqy'" src="../../assets/img/rightbar/avat.jpg" alt="">
-          <img v-if="item.user!=='dsy_zqy'" src="../../assets/img/customer.png" alt="">
+          <img v-if="item.user==='dsy_zqy'" src="http://www.shyding.xyz/MyImg/img/avat.46349574.jpg" alt="">
+          <img v-if="item.user!=='dsy_zqy'" src="http://www.shyding.xyz/MyImg/img/customer.4551dd9a.png" alt="">
           <div class="right">
             <div class="username" style="color: #409EFF"><span
                     style="color: #ff854f;border: 1px solid #ff854f;font-size: 14px;"
@@ -86,11 +86,6 @@
 
 
 <script>
-  import Pay from "../../components/pay/Pay";
-  import {Loading} from 'element-ui';
-  import hljs from 'highlight.js'
-  import {request} from "../../network/request";
-
   export default {
     name: "ArticleDetail",
     data() {
@@ -99,19 +94,17 @@
         id: 0,
         data: {},
         comment: '',
-        commentList: []
+        commentList: [],
       }
     },
     components: {
-      Pay
+      "Pay": () => import("../../components/pay/Pay")
     },
+
     beforeMount() {
-      Loading.service({fullscreen: true});
+      this.$loading.service({fullscreen: true});
     },
     mounted() {
-
-      hljs.initHighlighting()
-      /*单独刷新这个页面是不行的*/
 
       /*在这里从接口获取文章信息来展示*/
       this.getPath()
@@ -119,11 +112,17 @@
     },
     /*监听路由发生变化*/
     watch: {
-      '$route': 'getPath'
+      '$route'(to, from) {
+        if (to.path.includes('/home/article')) {
+          this.getPath()
+        }
+      },
+      id() {
+          this.getAll()
+      }
     },
     methods: {
       subComment() {
-
         /*检测登录没得*/
         if (!this.$store.getters.getUsername) {
           this.$message({
@@ -142,7 +141,7 @@
           });
         } else {
           /*把comment,文章id,username发过去*/
-          request({
+          this.request({
             url: '/comment/articleComment',
             method: "POST",
             data: {
@@ -164,7 +163,7 @@
       },
       getAll() {
         return new Promise(((resolve, reject) => {
-          request(`/comment/getAll?id=${this.id}`).then(res => {
+          this.request(`/comment/getAll?id=${this.id}`).then(res => {
             this.commentList = res.data
             resolve('233')
           })
@@ -178,10 +177,10 @@
       },
       getPath() {
         this.id = this.$route.params.id
-        request("/getdetail?id=" + this.id + "").then(res => {
+        this.request("/getdetail?id=" + this.id + "").then(res => {
           this.data = res.data[0]
           this.data.content = this.data.content.replace(/dsy/g, "'")
-          let loadingInstance = Loading.service({fullscreen: true});
+          let loadingInstance = this.$loading.service({fullscreen: true});
           loadingInstance.close();
         })
       }
@@ -200,6 +199,8 @@
 </script>
 
 <style scoped>
+  @import "https://highlightjs.org/static/demo/styles/dracula.css";
+
   .list {
     background-color: rgba(242, 242, 242, 0.71);
     margin-top: 5px;
@@ -228,7 +229,14 @@
     padding-bottom: 60px;
   }
 
+  .container {
+    width: 95%;
+  }
+
   .detail-content {
+
+    background-color: #F6F8FA;
+    /*background-color: white;*/
     padding-top: 20px;
     display: flex;
     flex-direction: column;
@@ -259,9 +267,10 @@
   }
 
   .detail {
-    box-shadow: 0 0 5px rgba(0, 0, 0, .1);
+    box-shadow: 0 0 8px rgba(0, 0, 0, .3);
     border-radius: 3px;
     width: 55%;
+    z-index: 999;
   }
 
   .summery {
@@ -282,18 +291,32 @@
     color: #464646;
   }
 
+  @media not screen and (min-width: 65em) {
+    .detail {
+      width: 80%;
+
+    }
+  }
   @media not screen and (min-width: 45em) {
     .detail {
       width: 100%;
+      margin-top: 20%;
     }
 
     .detail-content img {
       height: 200px;
-      width: 80%;
+      width: 100%;
     }
 
     .container {
+      width: 96%;
+    }
+  }
 
+  @media not screen and (min-width: 40em) {
+    .detail {
+      width: 100%;
+      margin-top: 40%;
     }
   }
 </style>

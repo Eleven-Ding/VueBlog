@@ -9,7 +9,7 @@
           <div>{{friend.des}}</div>
         </div>
       </div>
-      <img class="avat" :src="friend.path" alt="">
+      <img class="avat" v-lazy="friend.path" alt="">
     </div>
   </a>
 </template>
@@ -28,7 +28,7 @@
 
 <style scoped>
   .friend-item::before {
-    background-color: rgba(255, 171, 153, 0.55);
+    background-image: linear-gradient(-225deg, #2CD8D5 0%, #C5C1FF 56%, #FFBAC3 100%);
     content: "";
     width: 100%;
     height: 0%;
@@ -42,6 +42,9 @@
   .friend-item:hover::before{
     height: 700%;
   }
+  .friend-item:hover{
+    color: white;
+  }
 
   .friend-item:hover .avat{
     animation: rotation .3s linear;
@@ -50,6 +53,7 @@
 
 
   .friend-item {
+    background-color: white;
     overflow: hidden;
     position: relative;
     transition: all .3s linear;
@@ -75,11 +79,10 @@
   .avat {
     transition: all .3s linear;
     z-index: 2;
-    width: 80px;
-    height: 80px;
+    max-width: 100%;
+    max-height: 100%;
     border-radius: 50%;
     border: 1px dashed rgba(204, 204, 204, 0.63);
-    flex: 1;
   }
 
   .title, .des {
