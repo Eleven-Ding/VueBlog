@@ -1,9 +1,6 @@
 export function request(config) {
   //1.创建实例
-  const instance = axios.create({
-    baseURL: 'http://47.92.39.166:3000'
-    // baseURL: 'http://192.168.1.4:3000'
-  })
+  //此处省略BaseUrl
 
   //2.axios的拦截器
   //这里是拦截请求
